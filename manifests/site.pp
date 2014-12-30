@@ -131,12 +131,15 @@ class base_class {
     ensure => directory,
   }
 
+  # work 和 op 账号组设置.
   group { "work":
     gid    => 2000,
   }
   group { "op":
     gid    => 2001,
   }
+
+  # work 账号设置.
   user{
     "work":
       ensure=> present,
@@ -146,7 +149,7 @@ class base_class {
       shell=>"/bin/bash",
       home=>"/home/work",
       managehome =>true,
-      password=>'$1$sCyMXcvD$jOiicUxPrZx.2s6rAqk3R/',
+      password=>'$1$sCyMXcvD$jOxxxxxxZx.2s6rAqk3R/',
   }
   file {"/home/work":
     mode => 755,
@@ -169,6 +172,8 @@ class base_class {
     owner => work,
     group => work
   }
+
+  # op 账号设置.
   user{
     "op":
       ensure=> present,
@@ -178,7 +183,7 @@ class base_class {
       shell=>"/bin/bash",
       home=>"/home/op",
       managehome =>true,
-      password=>'$1$jBYVJteF$df6YALsdde8blPoDL2fIL.',
+      password=>'$1$jBYVJteF$df6YAxxxxde8blPoDL2fIL.',
   }
   file {"/home/op":
     mode => 755,

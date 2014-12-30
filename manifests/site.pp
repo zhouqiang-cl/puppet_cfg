@@ -207,7 +207,7 @@ class base_class {
     group => op
   }
 
-  # 自定义脚本, 用来处理一些不好配置
+  # 自定义脚本, 用来临时跑脚本.
   file {"/root/custom_script.sh":
 	  source =>"puppet:///modules/custom_script/custom_script.sh",
 	  group => root,

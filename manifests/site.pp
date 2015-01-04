@@ -74,12 +74,16 @@ class base_class {
     ensure => true,
     enable => true,
     hasrestart => true,
+    require => Package['supervisor'],
+    before => File['/etc/supervisord.conf'],
   }
+  # 自定义 supervisord.conf 配置文件.
   file {"/etc/supervisord.conf":
     source =>"puppet:///modules/supervisord_conf/supervisord.conf",
     group => root,
     owner => root,
     mode  => 644,
+    require => Package['supervisor']
   }
 
   # 所有机器安装 lighttpd 用于 nginx 7 层检测.
@@ -91,6 +95,7 @@ class base_class {
     ensure => true,
     enable => true,
     hasrestart => false,
+    require => Package['lighttpd']
   }
 
   # 根据机器 IP 或者主机名设置不同的 DNS 配置.

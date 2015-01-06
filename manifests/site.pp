@@ -99,7 +99,10 @@ class base_class {
   }
 
   # 根据机器 IP 或者主机名设置不同的 DNS 配置.
-  if ("10.0.96" in $ipaddress_em2) {
+  if ($ipaddress_em2 != "" and "10.0.96" in $ipaddress_em2) {
+    $dns_server="10.0.96.61"
+  }
+  elsif ($ipaddress_eth1 != "" and "10.0.96" in $ipaddress_eth1) {
     $dns_server="10.0.96.61"
   }
   # if $fqdn =~ /^stg\d+/ {

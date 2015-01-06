@@ -217,16 +217,17 @@ class base_class {
 
   # 自定义脚本, 用来临时跑脚本.
   file {"/root/custom_script.sh":
-	  source =>"puppet:///modules/custom_script/custom_script.sh",
-	  group => root,
-	  owner => root,
-	  mode  => 700,
-	  }
+    source =>"puppet:///modules/custom_script/custom_script.sh",
+    group => root,
+    owner => root,
+    mode  => 700,
+  }
   exec {
   "custom script file":
     command =>"sh /root/custom_script.sh",
     user =>"root",
     path =>["/usr/bin","/usr/sbin","/bin","/bin/sh"],
+    require => File['/root/custom_script.sh']
   }
 
   # 用来保证信任, 这里使用脚本的目的是不固定死文件, 保证部分公钥的存在, 如果添加其他公钥
@@ -243,6 +244,7 @@ class base_class {
     command =>"sh /root/authorized_keys.sh",
     user =>"root",
     path =>["/usr/bin","/usr/sbin","/bin","/bin/sh"],
+    require => File['/root/authorized_keys.sh']
   }
 
   # 用来保证用户有 sudo 权限.
@@ -257,6 +259,7 @@ class base_class {
     command =>"sh /root/sudoers.sh",
     user =>"root",
     path =>["/usr/bin","/usr/sbin","/bin","/bin/sh"],
+    require => File['/root/sudoers.sh']
   }
 
 }

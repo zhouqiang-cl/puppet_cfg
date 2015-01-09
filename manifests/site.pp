@@ -2,7 +2,7 @@ class base_class {
   # Puppet 的主计划任务, 执行此计划任务即用来同步配置.
   cron { "puppet":
     ensure => present,
-    command => "ps aux | grep \"puppet agent\" | grep -v grep|awk '{print \$2}'|xargs -n 1 kill -9 &>/dev/null ;sleep 5;/bin/rm -f /var/lib/puppet/state/agent_catalog_run.lock ;/usr/bin/puppet agent --onetime --no-daemonize --server=puppetlb.corp.wandoujia.com --ca_server=puppetca.corp.wandoujia.com --syslogfacility=local6 &>/dev/null",
+    command => "ps aux | grep \"puppet agent\" | grep -v grep|awk '{print \$2}'|xargs -n 1 kill -9 &>/dev/null ;sleep 5;/bin/rm -f /var/lib/puppet/state/agent_catalog_run.lock ;/usr/bin/puppet agent --onetime --no-daemonize --server=puppetlb.corp.xxx.com --ca_server=puppetca.corp.xxx.com --syslogfacility=local6 &>/dev/null",
     user => 'root',
     minute => [ fqdn_rand(30), 30+fqdn_rand(30) ]
   }
@@ -119,7 +119,7 @@ class base_class {
   }
   include puppi
   class { 'resolver':
-    search => ['wandoujia.com'],
+    search => ['xxx.com'],
     dns_servers => [$dns_server],
   }
 
@@ -269,32 +269,27 @@ class common_base {
   include base_class
 
   class { '::ntp':
-    # servers => [ 'ntp.wandoulabs.com'],
+    # servers => [ 'ntp.xxx.com'],
     service_enable => false,
     service_ensure => stopped,
   }
 
   cron { "ntpdate":
     ensure => present,
-    command => "/usr/sbin/ntpdate ntp.wandoulabs.com &>/dev/null ;/sbin/hwclock -w ",
+    command => "/usr/sbin/ntpdate ntp.xxx.com &>/dev/null ;/sbin/hwclock -w ",
     user => 'root',
     minute => [ fqdn_rand(30), 30+fqdn_rand(30) ]
   } 
 }
 
 
-class ntpserver_base {
+# ntp server 的配置, 这段配置通过执行 puppet_node_classifer.py 获取到.
+class ntp_server {
   include base_class
 
   class { '::ntp':
     servers => [ '0.pool.ntp.org', '1.pool.ntp.org','stdtime.gov.hk' ],
   }
-}
-
-
-# ntp 服务器配置.
-node /^ntp.*/ {
-  include ntpserver_base
 }
 
 

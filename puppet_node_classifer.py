@@ -55,8 +55,9 @@ def main():
             _classes = classes
             break
 
+    # 设默认值.
     if "_classes" not in locals():
-        sys.exit()
+        _classes = "puppet_default" 
 
     _conf = {
         "classes":

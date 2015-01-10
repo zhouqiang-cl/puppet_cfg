@@ -294,6 +294,6 @@ class ntp_server {
 
 
 # 默认配置.
-node default {
+class puppet_default {
   include common_base
 }

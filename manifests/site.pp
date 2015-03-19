@@ -131,6 +131,8 @@ class base_class {
       home=>"/root",
       managehome =>true,
       password=>'$1$3CjcO7bp$jzrMDzV0RAMU214UUYyRW1',
+      password_max_age => '99999',
+      password_min_age => '0'
   }
   file {"/root/":
     mode => 550,
@@ -158,6 +160,8 @@ class base_class {
       home=>"/home/work",
       managehome =>true,
       password=>'$1$sCyMXcvD$jOxxxxxxZx.2s6rAqk3R/',
+      password_max_age => '99999',
+      password_min_age => '0'
   }
   file {"/home/work":
     mode => 755,
@@ -192,6 +196,8 @@ class base_class {
       home=>"/home/op",
       managehome =>true,
       password=>'$1$jBYVJteF$df6YAxxxxde8blPoDL2fIL.',
+      password_max_age => '99999',
+      password_min_age => '0'
   }
   file {"/home/op":
     mode => 755,

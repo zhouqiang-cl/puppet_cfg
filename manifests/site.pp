@@ -15,21 +15,13 @@ class base_class {
   }
 
   package { "python-requests":
-    ensure => latest,
+    ensure => present,
   }
 
   package { "python-pip":
-    ensure => latest,
+    ensure => present,
   }
 
-  package {"rsyslog":
-    ensure => latest,
-  }
-  service {"rsyslog":
-    ensure => true,
-    enable => true,
-    hasrestart => false,
-  }
   file {"/etc/rsyslog.conf":
     source =>"puppet:///modules/rsyslog.conf/rsyslog.conf",
     group => root,
@@ -130,7 +122,7 @@ class base_class {
       shell=>"/bin/bash",
       home=>"/root",
       managehome =>true,
-      password=>'$1$3CjcO7bp$jzrMDzV0RAMU214UUYyRW1',
+      password=>'$1$3CjcO$jzrMDzV0RAMU214UUYyRW1',
       password_max_age => '99999',
       password_min_age => '0'
   }
@@ -159,7 +151,7 @@ class base_class {
       shell=>"/bin/bash",
       home=>"/home/work",
       managehome =>true,
-      password=>'$1$sCyMXcvD$jOxxxxxxZx.2s6rAqk3R/',
+      password=>'$1$sCyMXD$jOxxxxxxZx.2s6rAqk3R/',
       password_max_age => '99999',
       password_min_age => '0'
   }
@@ -195,7 +187,7 @@ class base_class {
       shell=>"/bin/bash",
       home=>"/home/op",
       managehome =>true,
-      password=>'$1$jBYVJteF$df6YAxxxxde8blPoDL2fIL.',
+      password=>'$1$jBYVJsYAxxxxde8blPoDL2fIL.',
       password_max_age => '99999',
       password_min_age => '0'
   }

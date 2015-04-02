@@ -176,9 +176,15 @@ then
     echo "*             hard   nproc           8192" >>/etc/security/limits.conf
 fi
 
-if ! grep -P "\*\s+soft\s+nproc\s+8192" /etc/security/limits.d/90-nproc.conf 
+## Centos6 的 nproc 需修改此文件
+if ! grep -P "\*\s+soft\s+nproc\s+8192" /etc/security/limits.d/90-nproc.conf
 then
     sed -i "/*          soft    nproc/s/.*/*          soft    nproc     8192/g" /etc/security/limits.d/90-nproc.conf
+fi
+## Centos7 的 nproc 需修改此文件
+if ! grep -P "\*\s+soft\s+nproc\s+8192" /etc/security/limits.d/20-nproc.conf
+then
+    sed -i "/*          soft    nproc/s/.*/*          soft    nproc     8192/g" /etc/security/limits.d/20-nproc.conf
 fi
 
 

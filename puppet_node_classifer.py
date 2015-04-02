@@ -44,7 +44,7 @@ def get_classes_to_nodes():
 
 
 def main():
-    hostname = sys.argv[1].replace(".wandoujia.com", "")
+    hostname = sys.argv[1].replace(".nosa.me", "")
     _ret = get_classes_to_nodes()
     if not _ret[0]:
         print _ret[1]

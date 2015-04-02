@@ -29,14 +29,6 @@ class base_class {
     mode  => 644,
   }
 
-  # 主要加了一个 set background=dark.
-  file {"/etc/vimrc":
-    source =>"puppet:///modules/vimrc/vimrc",
-    group => root,
-    owner => root,
-    mode  => 644,
-  }
-
   # 修改 sar 的执行频率.
   file {"/etc/cron.d/sysstat":
     source =>"puppet:///modules/sysstat/sysstat",
@@ -54,7 +46,7 @@ class base_class {
   }
 
   # 自定义的 yum 仓库.
-  package { "wandoulabs-release":
+  package { "nosa-release":
     ensure => latest,
   }
 

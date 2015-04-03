@@ -56,9 +56,12 @@ fi
 
 
 # 去掉 alias rm
-sed -i "/alias rm=/s/^/#/" /root/.bashrc
-sed -i "/alias cp=/s/^/#/" /root/.bashrc
-sed -i "/alias mv=/s/^/#/" /root/.bashrc
+if test -f /root/.bashrc
+then
+    sed -i "/alias rm=/s/^/#/" /root/.bashrc
+    sed -i "/alias cp=/s/^/#/" /root/.bashrc
+    sed -i "/alias mv=/s/^/#/" /root/.bashrc
+fi
 for i in op work 
 do
     sed -i "/alias rm=/s/^/#/" /home/$i/.bashrc
@@ -284,6 +287,7 @@ then
     if [[ "${_x}" -eq "0" ]]
     then
         echo 1 >/proc/sys/net/ipv6/conf/all/disable_ipv6
+        service sshd restart ||systemctl restart sshd.service
     fi
 fi
 if test -f /proc/sys/net/ipv6/conf/default/disable_ipv6
@@ -292,6 +296,7 @@ then
     if [[ "${_y}" -eq "0" ]]
     then
         echo 1 >/proc/sys/net/ipv6/conf/default/disable_ipv6
+        service sshd restart ||systemctl restart sshd.service
     fi
 fi
 

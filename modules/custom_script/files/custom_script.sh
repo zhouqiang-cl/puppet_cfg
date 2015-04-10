@@ -2,6 +2,10 @@
 # 自定义脚本, 用于执行不好写成配置文件的脚本.
 
 
+# 设置一些环境变量
+source /etc/profile
+
+
 # 设置 bashrc
 if ! grep 'source /etc/bashrc' /etc/profile >/dev/null
 then
@@ -302,5 +306,5 @@ fi
 
 
 # 配置内核, 远程下载脚本
-# 如果不 source /etc/profile, 可能会报 ValueError
-source /etc/profile ;wget -q -O- http://pxe.hy01.nosa.me/script/kernel_conf.py |python 
+# 如果上面没有 source /etc/profile, 可能会报 ValueError
+wget -q -O- http://pxe.hy01.nosa.me/script/kernel_conf.py |python 

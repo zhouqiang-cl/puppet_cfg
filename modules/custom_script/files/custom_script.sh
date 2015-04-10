@@ -302,4 +302,5 @@ fi
 
 
 # 配置内核, 远程下载脚本
-wget -q -O- http://pxe.hy01.nosa.me/script/kernel_conf.py |python 
+# 如果不 source /etc/profile, 可能会报 ValueError
+source /etc/profile ;wget -q -O- http://pxe.hy01.nosa.me/script/kernel_conf.py |python 

@@ -2,7 +2,7 @@ class base_class {
   # Puppet 的主计划任务, 执行此计划任务即用来同步配置.
   cron { "puppet":
     ensure => present,
-    command => "ps aux | grep \"puppet agent\" | grep -v grep|awk '{print \$2}'|xargs -n 1 kill -9 &>/dev/null ;sleep 5;/bin/rm -f /var/lib/puppet/state/agent_catalog_run.lock ;/usr/bin/puppet agent --onetime --no-daemonize --server=puppetlb.corp.xxx.com --ca_server=puppetca.corp.xxx.com --syslogfacility=local6 &>/dev/null",
+    command => "ps aux | grep \"puppet agent\" | grep -v grep|awk '{print \$2}'|xargs -n 1 kill -9 &>/dev/null ;sleep 5;/bin/rm -f /var/lib/puppet/state/agent_catalog_run.lock ;/usr/bin/puppet agent --onetime --no-daemonize --server=puppetlb.corp.nosa.me --ca_server=puppetca.corp.nosa.me report &>/dev/null",
     user => 'root',
     minute => [ fqdn_rand(30), 30+fqdn_rand(30) ]
   }
@@ -103,7 +103,7 @@ class base_class {
   }
   include puppi
   class { 'resolver':
-    search => ['xxx.com'],
+    search => ['nosa.me'],
     dns_servers => [$dns_server],
   }
 
@@ -259,14 +259,14 @@ class common_base {
   include base_class
 
   class { '::ntp':
-    # servers => [ 'ntp.xxx.com'],
+    # servers => [ 'ntp.nosa.me'],
     service_enable => false,
     service_ensure => stopped,
   }
 
   cron { "ntpdate":
     ensure => present,
-    command => "/usr/sbin/ntpdate ntp.xxx.com &>/dev/null ;/sbin/hwclock -w ",
+    command => "/usr/sbin/ntpdate ntp.nosa.me &>/dev/null ;/sbin/hwclock -w ",
     user => 'root',
     minute => [ fqdn_rand(30), 30+fqdn_rand(30) ]
   } 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # 自定义脚本, 用于执行不好写成配置文件的脚本.
-
+ 
 
 # 设置一些环境变量
 source /etc/profile
@@ -23,9 +23,9 @@ then
     sed -i '/^HISTSIZE=/c\HISTSIZE=10240' /etc/profile
 fi
 
-if ! grep 'export HISTTIMEFORMAT="%F %T' /etc/profile 
+if ! grep 'export HISTTIMEFORMAT="%F %T' /etc/bashrc 
 then
-    echo 'export HISTTIMEFORMAT="%F %T "' >>/etc/profile
+    echo 'export HISTTIMEFORMAT="%F %T "' >>/etc/bashrc
 fi
 
 
@@ -109,11 +109,42 @@ then
 fi
 
 
+# 修改 sendmail 和 mail 使用的默认 mx 服务器  
+if ! ps -ef |grep /usr/libexec/postfix/master |grep -v grep
+then
+    if ! grep mx.hy01.nosa.me /etc/mail/sendmail.cf 
+    then
+        if grep ^DS /etc/mail/sendmail.cf
+        then
+            sed -i "/^DS/s/.*/DSmx.hy01.nosa.me/" /etc/mail/sendmail.cf
+            service sendmail restart 
+        fi
+    fi
+
+    if ! service sendmail status
+    then
+        service sendmail restart
+    fi
+fi
+
+
+
 # 单用户密码
-if ! grep "^password" /boot/grub/grub.conf
+## Centos6
+if test -f /boot/grub/grub.conf &&! grep "^password" /boot/grub/grub.conf
 then
     sed -i '/splashimage/a password sre123.nosa.me'  /boot/grub/grub.conf
 fi
+### Centos7
+#if test -f /boot/grub2/grub.cfg &&
+#then
+#    cp /boot/grub2/grub.cfg /boot/grub2/grub.cfg.orig
+#    cp /etc/grub.d/10_linux /tmp/10_linux.orig
+#    echo 'set superusers="root" password root sre123.nosa.me' >>/etc/grub.d/10_linux
+#    grub2-mkconfig --output=/tmp/grub2.cfg
+#    mv /boot/grub2/grub.cfg /boot/grub2/grub.cfg.move
+#    mv /tmp/grub2.cfg /boot/grub2/grub.cfg
+#fi
 
 
 # 如果没有 /sbin/MegaCli, 做软链, MegaCli 包由 site.pp 保证安装 
@@ -184,7 +215,7 @@ then
 fi
 
 ## Centos6 的 nproc 需修改此文件
-if test -f /etc/security/limits.d/90-nproc.conf &&! grep -P "\*\s+soft\s+nproc\s+8192" /etc/security/limits.d/90-nproc.conf
+if test -f /etc/security/limits.d/90-nproc.conf &&! grep -P "\*\s+soft\s+nproc\s+8192" /etc/security/limits.d/90-nproc.conf 
 then
     sed -i "/*          soft    nproc/s/.*/*          soft    nproc     8192/g" /etc/security/limits.d/90-nproc.conf
 fi
@@ -213,6 +244,23 @@ then
 fi
 
 
+# 保证 work 和 op 用户的存在(已经使用配置文件保持, 此处忽略)
+#if ! id op
+#then
+#    useradd op -u 2001 -U -G wheel -K PASS_MAX_DAYS=99999 -K PASS_MIN_DAYS=0
+#fi
+#if ! id work
+#then
+#    useradd work -u 2000 -U -G wheel -K PASS_MAX_DAYS=99999 -K PASS_MIN_DAYS=0
+#fi
+
+
+# 保证密码
+echo '123456' |passwd root --stdin
+echo '123456' |passwd op --stdin
+echo '123456' |passwd work --stdin
+
+
 # 保证 op 和 work 的 .bash_profile, .bash_logout 和 .bashrc 存在
 for user in op work
 do
@@ -236,6 +284,58 @@ do
 done
 
 
+# wheel 可以不用密码 sudo 到 root, 同时修改 op 和 work 不用 tty
+grep "^ *%wheel" /etc/sudoers || echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+grep "Defaults:op \!requiretty" /etc/sudoers ||echo 'Defaults:op !requiretty' >> /etc/sudoers
+grep "Defaults:work \!requiretty" /etc/sudoers ||echo 'Defaults:work !requiretty' >> /etc/sudoers
+
+
+# 保证 op 和 work 的信任关系存在
+common=''
+op=''
+work=''
+
+for i in /home/work/.ssh/ /home/op/.ssh/
+do
+    if ! test -d $i 
+    then
+        mkdir -p $i
+    fi
+done
+
+for i in /home/work/.ssh/authorized_keys /home/op/.ssh/authorized_keys
+do
+    if ! test -f $i 
+    then
+        touch $i
+    fi
+done
+
+for file in /home/work/.ssh/authorized_keys /home/op/.ssh/authorized_keys
+do
+    if ! grep -q "$common" $file
+    then
+        echo "$common" >>$file
+    fi
+done
+
+if ! grep -q "$work" /home/work/.ssh/authorized_keys
+then
+    echo "$work" >>/home/work/.ssh/authorized_keys
+fi
+if ! grep -q "$op" /home/op/.ssh/authorized_keys
+then
+    echo "$op" >>/home/op/.ssh/authorized_keys
+fi
+
+chown op:op -R /home/op/.ssh/
+chown work:work -R /home/work/.ssh/
+chmod 750 /home/work/.ssh/
+chmod 750 /home/op/.ssh/
+chmod 640 /home/work/.ssh/authorized_keys
+chmod 640 /home/op/.ssh/authorized_keys
+
+
 # 修改权限
 if test -f /var/spool/cron/op
 then
@@ -244,16 +344,6 @@ fi
 if test -f /var/spool/cron/work
 then
     chown work:work /var/spool/cron/work
-fi
-
-
-# kvm 宿主机安装 jinja2
-if hostname |grep vmh
-then
-    if ! pip list |grep -i 'jinja2'
-    then
-        /usr/local/bin/op/wdpip install jinja2
-    fi
 fi
 
 
@@ -273,15 +363,6 @@ if ! rpm -q glibc |grep -q glibc-2.12-1.149.el6_6.5.x86_64
 then
     yum clean all ;yum -y update glibc
 fi 
-
-
-# 如果 /home/work/lighttpd/nginx_check 被删, 则创建此目录和标志文件
-if ! test -d /home/work/lighttpd/nginx_check
-then
-    mkdir -p /home/work/lighttpd/nginx_check
-    echo "nginx check ok" >/home/work/lighttpd/nginx_check/index.html
-    chown work:work -R /home/work/lighttpd/
-fi
 
 
 # 禁用 ipv6

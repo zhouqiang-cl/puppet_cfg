@@ -22,13 +22,6 @@ class base_class {
     ensure => present,
   }
 
-  file {"/etc/rsyslog.conf":
-    source =>"puppet:///modules/rsyslog.conf/rsyslog.conf",
-    group => root,
-    owner => root,
-    mode  => 644,
-  }
-
   # 修改 sar 的执行频率.
   file {"/etc/cron.d/sysstat":
     source =>"puppet:///modules/sysstat/sysstat",

@@ -1,4 +1,4 @@
-class base_class {
+class puppet_class {
   # Puppet 的主计划任务, 执行此计划任务即用来同步配置.
   cron { "puppet":
     ensure => present,
@@ -6,6 +6,11 @@ class base_class {
     user => 'root',
     minute => [ fqdn_rand(30), 30+fqdn_rand(30) ]
   }
+}
+
+
+class base_class {
+  include puppet_class
 
   class { 'selinux::disabled':
   }

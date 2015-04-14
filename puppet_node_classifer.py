@@ -77,8 +77,13 @@ def main():
 
     # 如果 hostname 在 IGNORES 里面, 啥也不做. 
     if hostname in IGNORES:
-        print yaml.dump({})
-        return 
+        _conf = {
+            "classes":
+            ["puppet_class"]
+        }
+        print yaml.dump(_conf, explicit_start=True, \
+            default_flow_style=False)
+        return
 
     # 如果 hostname 匹配 KEYS 里面关键字, 返回相应的配置.
     for i in KEYS:

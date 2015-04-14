@@ -285,55 +285,56 @@ done
 
 
 # wheel 可以不用密码 sudo 到 root, 同时修改 op 和 work 不用 tty
-grep "^ *%wheel" /etc/sudoers || echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-grep "Defaults:op \!requiretty" /etc/sudoers ||echo 'Defaults:op !requiretty' >> /etc/sudoers
-grep "Defaults:work \!requiretty" /etc/sudoers ||echo 'Defaults:work !requiretty' >> /etc/sudoers
+# (已经通过配置保持, 此处注释)
+#grep "^ *%wheel" /etc/sudoers || echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+#grep "Defaults:op \!requiretty" /etc/sudoers ||echo 'Defaults:op !requiretty' >> /etc/sudoers
+#grep "Defaults:work \!requiretty" /etc/sudoers ||echo 'Defaults:work !requiretty' >> /etc/sudoers
 
 
-# 保证 op 和 work 的信任关系存在
-common=''
-op=''
-work=''
-
-for i in /home/work/.ssh/ /home/op/.ssh/
-do
-    if ! test -d $i 
-    then
-        mkdir -p $i
-    fi
-done
-
-for i in /home/work/.ssh/authorized_keys /home/op/.ssh/authorized_keys
-do
-    if ! test -f $i 
-    then
-        touch $i
-    fi
-done
-
-for file in /home/work/.ssh/authorized_keys /home/op/.ssh/authorized_keys
-do
-    if ! grep -q "$common" $file
-    then
-        echo "$common" >>$file
-    fi
-done
-
-if ! grep -q "$work" /home/work/.ssh/authorized_keys
-then
-    echo "$work" >>/home/work/.ssh/authorized_keys
-fi
-if ! grep -q "$op" /home/op/.ssh/authorized_keys
-then
-    echo "$op" >>/home/op/.ssh/authorized_keys
-fi
-
-chown op:op -R /home/op/.ssh/
-chown work:work -R /home/work/.ssh/
-chmod 750 /home/work/.ssh/
-chmod 750 /home/op/.ssh/
-chmod 640 /home/work/.ssh/authorized_keys
-chmod 640 /home/op/.ssh/authorized_keys
+# 保证 op 和 work 的信任关系存在(已经通过配置保持, 此处注释)
+#common=''
+#op=''
+#work=''
+#
+#for i in /home/work/.ssh/ /home/op/.ssh/
+#do
+#    if ! test -d $i 
+#    then
+#        mkdir -p $i
+#    fi
+#done
+#
+#for i in /home/work/.ssh/authorized_keys /home/op/.ssh/authorized_keys
+#do
+#    if ! test -f $i 
+#    then
+#        touch $i
+#    fi
+#done
+#
+#for file in /home/work/.ssh/authorized_keys /home/op/.ssh/authorized_keys
+#do
+#    if ! grep -q "$common" $file
+#    then
+#        echo "$common" >>$file
+#    fi
+#done
+#
+#if ! grep -q "$work" /home/work/.ssh/authorized_keys
+#then
+#    echo "$work" >>/home/work/.ssh/authorized_keys
+#fi
+#if ! grep -q "$op" /home/op/.ssh/authorized_keys
+#then
+#    echo "$op" >>/home/op/.ssh/authorized_keys
+#fi
+#
+#chown op:op -R /home/op/.ssh/
+#chown work:work -R /home/work/.ssh/
+#chmod 750 /home/work/.ssh/
+#chmod 750 /home/op/.ssh/
+#chmod 640 /home/work/.ssh/authorized_keys
+#chmod 640 /home/op/.ssh/authorized_keys
 
 
 # 修改权限

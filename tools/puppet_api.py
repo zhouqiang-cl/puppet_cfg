@@ -11,6 +11,9 @@ dashboard_host = "puppetdashboard.corp.nosa.me"
 certificate_host = "puppetca1.nosa01:8140"
 
 
+requests.packages.urllib3.disable_warnings()
+
+
 def hosts_failed():
     """ 查找哪些机器 Puppet 执行失败.
 

@@ -4,7 +4,6 @@
 
 import sys
 import requests
-import json
 import re
 
 import yaml
@@ -47,29 +46,21 @@ IGNORES = ["ignore0.nosa01"]
 
 def get_hostnames_from_sys(node_id):
     url = "http://sys.hy01.internal.nosa.me/server/api/servers?"\
-            "type=recursive&node_id=%s" % node_id
+          "type=recursive&node_id=%s" % node_id
 
-    try:
-        ret = requests.get(url)
-        data_list = json.loads(ret.content)["data"]
-        hostname_list = [i["hostname"] for i in data_list]
-        return (True, hostname_list)
-    except Exception, e:
-        return (False, "%s" % e)
+    ret = requests.get(url)
+    return [i["hostname"] for i in ret.json()["data"]]
 
 
 def get_classes_to_nodes():
-    _classes_to_nodes = {}
+    classes_to_nodes = {}
     for classes in IDS:
         nodes = []
         for _id in IDS[classes]:
             _ret = get_hostnames_from_sys(_id)
-            if not _ret[0] :
-                return (False, _ret[1])
-            else:
-                nodes.extend(_ret[1])  
-        _classes_to_nodes[classes] = nodes
-    return (True, _classes_to_nodes)
+            nodes.extend(_ret)  
+        classes_to_nodes[classes] = nodes
+    return  classes_to_nodes
 
 
 def main():
@@ -81,8 +72,8 @@ def main():
             "classes":
             ["puppet_class"]
         }
-        print yaml.dump(_conf, explicit_start=True, \
-            default_flow_style=False)
+        print yaml.dump(_conf, explicit_start=True, 
+                        default_flow_style=False)
         return
 
     # 如果 hostname 匹配 KEYS 里面关键字, 返回相应的配置.
@@ -92,16 +83,12 @@ def main():
                 "classes":
                 [KEYS[i]]
             }
-            print yaml.dump(_conf, explicit_start=True, \
-                default_flow_style=False)
+            print yaml.dump(_conf, explicit_start=True, 
+                            default_flow_style=False)
             return
 
     # 从 sys 上获取节点来配置.
-    _ret = get_classes_to_nodes()
-    if not _ret[0]:
-        print _ret[1]
-        sys.exit(1)
-    classes_to_nodes = _ret[1]
+    classes_to_nodes = get_classes_to_nodes()
     for classes in classes_to_nodes:
         if hostname in classes_to_nodes[classes]:
             _classes = classes
@@ -113,8 +100,8 @@ def main():
         "classes":
         [_classes]
     }
-    print yaml.dump(_conf, explicit_start=True, \
-        default_flow_style=False)
+    print yaml.dump(_conf, explicit_start=True, 
+                    default_flow_style=False)
     
 
 if __name__ == '__main__':

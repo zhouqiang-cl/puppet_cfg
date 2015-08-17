@@ -1,11 +1,11 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 
-
 import sys
-import requests
 import re
+import json
 
+import requests
 import yaml
 
 
@@ -15,7 +15,7 @@ IDS = {
         2388,
         2401,
         2397,
-        2405 
+        2405
     ],
     "online_ng_internal": [
         2392,
@@ -41,39 +41,40 @@ KEYS = {
     "cobar": "cobar"
 }
 
-IGNORES = ["ignore0.nosa01"]
+IGNORE_ID = 2980
 
 
-def get_hostnames_from_sys(node_id):
-    url = "http://sys.hy01.internal.nosa.me/server/api/servers?"\
-          "type=recursive&node_id=%s" % node_id
+def get_hostname_from_loki(node_id):
+    url = "http://loki.hy01.internal.wandoujia.com/server/api/servers?"\
+            "type=recursive&node_id=%s" % node_id
 
     ret = requests.get(url)
-    return [i["hostname"] for i in ret.json()["data"]]
+    return [i["hostname"] for i in json.loads(ret.content)["data"]]
 
 
 def get_classes_to_nodes():
     classes_to_nodes = {}
     for classes in IDS:
         nodes = []
-        for _id in IDS[classes]:
-            _ret = get_hostnames_from_sys(_id)
-            nodes.extend(_ret)  
+        for id in IDS[classes]:
+            ret = get_hostname_from_loki(id)
+            nodes.extend(ret)
         classes_to_nodes[classes] = nodes
-    return  classes_to_nodes
+    return classes_to_nodes
 
 
 def main():
-    hostname = sys.argv[1].replace(".nosa.me", "")
+    hostname = sys.argv[1].replace(".wandoujia.com", "")
 
-    # 如果 hostname 在 IGNORES 里面, 啥也不做. 
-    if hostname in IGNORES:
+    # 如果 hostname 在 IGNORE_ID 包换的列表里, 啥也不做.
+    ignore_hosts = get_hostname_from_loki(IGNORE_ID)
+    if hostname in ignore_hosts:
         _conf = {
             "classes":
             ["puppet_class"]
         }
-        print yaml.dump(_conf, explicit_start=True, 
-                        default_flow_style=False)
+        print yaml.dump(_conf, explicit_start=True, \
+            default_flow_style=False)
         return
 
     # 如果 hostname 匹配 KEYS 里面关键字, 返回相应的配置.
@@ -83,11 +84,11 @@ def main():
                 "classes":
                 [KEYS[i]]
             }
-            print yaml.dump(_conf, explicit_start=True, 
-                            default_flow_style=False)
+            print yaml.dump(_conf, explicit_start=True, \
+                default_flow_style=False)
             return
 
-    # 从 sys 上获取节点来配置.
+    # 从 loki 上获取节点来配置.
     classes_to_nodes = get_classes_to_nodes()
     for classes in classes_to_nodes:
         if hostname in classes_to_nodes[classes]:
@@ -100,9 +101,9 @@ def main():
         "classes":
         [_classes]
     }
-    print yaml.dump(_conf, explicit_start=True, 
-                    default_flow_style=False)
-    
+    print yaml.dump(_conf, explicit_start=True, \
+        default_flow_style=False)
+
 
 if __name__ == '__main__':
     main()

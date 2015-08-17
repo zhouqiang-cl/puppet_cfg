@@ -45,7 +45,7 @@ IGNORE_ID = 2980
 
 
 def get_hostname_from_loki(node_id):
-    url = "http://loki.hy01.internal.wandoujia.com/server/api/servers?"\
+    url = "http://loki.hy01.internal.nosa.me/server/api/servers?"\
             "type=recursive&node_id=%s" % node_id
 
     ret = requests.get(url)
@@ -64,7 +64,7 @@ def get_classes_to_nodes():
 
 
 def main():
-    hostname = sys.argv[1].replace(".wandoujia.com", "")
+    hostname = sys.argv[1].replace(".nosa.me", "")
 
     # 如果 hostname 在 IGNORE_ID 包换的列表里, 啥也不做.
     ignore_hosts = get_hostname_from_loki(IGNORE_ID)
